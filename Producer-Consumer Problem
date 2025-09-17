@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+int buffer, full=0;
+sem_t empty, mutex;
+
+void* producer(){
+    for(int i=1;i<=3;i++){
+        sem_wait(&empty); sem_wait(&mutex);
+        buffer=i; full=1; printf("Produced %d\n",i);
+        sem_post(&mutex); sem_post(&empty);
+    }
+}
+void* consumer(){
+    for(int i=1;i<=3;i++){
+        while(!full); sem_wait(&mutex);
+        printf("Consumed %d\n",buffer); full=0;
+        sem_post(&mutex);
+    }
+}
+int main(){
+    pthread_t p,c;
+    sem_init(&empty,0,1); sem_init(&mutex,0,1);
+    pthread_create(&p,0,producer,0); pthread_create(&c,0,consumer,0);
+    pthread_join(p,0); pthread_join(c,0);
+}

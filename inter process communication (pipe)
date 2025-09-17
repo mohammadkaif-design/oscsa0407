@@ -1,0 +1,14 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+    int fd[2]; char msg[]="Hello from Parent", buff[50];
+    pipe(fd);
+    if(fork()==0){ // child
+        read(fd[0], buff, sizeof(buff));
+        printf("Child read: %s\n", buff);
+    } else { // parent
+        write(fd[1], msg, strlen(msg)+1);
+    }
+}

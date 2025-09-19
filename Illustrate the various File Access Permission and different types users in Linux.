@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+void print_permissions(mode_t mode) {
+    // Owner
+    printf("Owner: ");
+    printf((mode & S_IRUSR) ? "read " : "");
+    printf((mode & S_IWUSR) ? "write " : "");
+    printf((mode & S_IXUSR) ? "execute " : "");
+    printf("\n");
+
+    // Group
+    printf("Group: ");
+    printf((mode & S_IRGRP) ? "read " : "");
+    printf((mode & S_IWGRP) ? "write " : "");
+    printf((mode & S_IXGRP) ? "execute " : "");
+    printf("\n");
+
+    // Others
+    printf("Others: ");
+    printf((mode & S_IROTH) ? "read " : "");
+    printf((mode & S_IWOTH) ? "write " : "");
+    printf((mode & S_IXOTH) ? "execute " : "");
+    printf("\n");
+}
+
+int main(int argc, char *argv[]) {
+    struct stat fileStat;
+
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        exit(1);
+    }
+
+    if (stat(argv[1], &fileStat) < 0) {
+        perror("stat");
+        exit(1);
+    }
+
+    printf("File: %s\n", argv[1]);
+    printf("File Size: %ld bytes\n", fileStat.st_size);
+    printf("Number of Links: %ld\n", fileStat.st_nlink);
+
+    printf("\nFile Permissions:\n");
+    print_permissions(fileStat.st_mode);
+
+    return 0;
+}
